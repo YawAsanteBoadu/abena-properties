@@ -1,0 +1,139 @@
+.hero {
+  background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+  padding: 80px 40px 60px;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.heroSubtitle {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.story {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px;
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: 24px;
+}
+
+.storyText p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--dark-gray);
+  margin-bottom: 16px;
+}
+
+.storyImage {
+  display: flex;
+  justify-content: center;
+}
+
+.stats {
+  background: var(--off-white);
+  padding: 60px 40px;
+}
+
+.statsGrid {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  text-align: center;
+}
+
+.values {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.valueCard {
+  padding: 36px 28px;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--shadow);
+  transition: transform var(--transition);
+}
+
+.valueCard:hover {
+  transform: translateY(-4px);
+}
+
+.valueIcon {
+  font-size: 36px;
+  color: var(--maroon);
+  margin-bottom: 16px;
+}
+
+.valueCard h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--black);
+}
+
+.valueCard p {
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 60px 20px 40px;
+  }
+
+  .heroTitle {
+    font-size: 32px;
+  }
+
+  .story {
+    padding: 60px 20px;
+  }
+
+  .storyGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .values {
+    padding: 60px 20px;
+  }
+
+  .valuesGrid {
+    grid-template-columns: 1fr;
+  }
+}

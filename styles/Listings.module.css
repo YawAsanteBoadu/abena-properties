@@ -1,0 +1,105 @@
+.hero {
+  background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+  padding: 80px 40px 60px;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.heroSubtitle {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.heroCounter {
+  margin-top: 24px;
+}
+
+.heroCounter .number {
+  color: var(--white);
+}
+
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 40px 80px;
+}
+
+.filters {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.filterBtn {
+  padding: 10px 28px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--dark-gray);
+  border: 2px solid var(--light-gray);
+  transition: all var(--transition);
+}
+
+.filterBtn:hover {
+  border-color: var(--maroon);
+  color: var(--maroon);
+}
+
+.filterActive {
+  background: var(--maroon);
+  color: var(--white);
+  border-color: var(--maroon);
+}
+
+.filterActive:hover {
+  background: var(--maroon-dark);
+  color: var(--white);
+  border-color: var(--maroon-dark);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 60px 20px 40px;
+  }
+
+  .heroTitle {
+    font-size: 32px;
+  }
+
+  .section {
+    padding: 40px 20px 60px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    gap: 8px;
+  }
+
+  .filterBtn {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+}

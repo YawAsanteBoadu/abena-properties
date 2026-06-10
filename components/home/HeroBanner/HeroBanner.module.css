@@ -1,0 +1,80 @@
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-image: url('/images/properties/hero_img.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 700px;
+  padding: 0 20px;
+}
+
+.heading {
+  font-size: 56px;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+
+.accent {
+  color: var(--maroon-light);
+}
+
+.subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 36px;
+  line-height: 1.7;
+}
+
+.exploreBtn {
+  display: inline-block;
+  padding: 16px 48px;
+  background: var(--maroon);
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.exploreBtn:hover {
+  background: var(--maroon-dark);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .hero {
+    background-attachment: scroll;
+  }
+
+  .heading {
+    font-size: 36px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .exploreBtn {
+    padding: 14px 36px;
+    font-size: 15px;
+  }
+}

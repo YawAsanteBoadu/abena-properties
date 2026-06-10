@@ -1,0 +1,152 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 0 40px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px var(--shadow);
+  transition: background var(--transition);
+}
+
+.navbarScrolled {
+  background: var(--white);
+  box-shadow: 0 2px 30px var(--shadow-lg);
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--maroon);
+  letter-spacing: -0.5px;
+}
+
+.logoAccent {
+  color: var(--black);
+}
+
+.socialIcons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.socialIcon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+  font-size: 14px;
+  transition: color var(--transition);
+}
+
+.socialIcon:hover {
+  color: var(--maroon);
+}
+
+.navLinks {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.navLink {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--dark-gray);
+  transition: color var(--transition);
+  position: relative;
+  padding: 4px 0;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--maroon);
+  transition: width var(--transition);
+}
+
+.navLink:hover {
+  color: var(--maroon);
+}
+
+.navLink:hover::after {
+  width: 100%;
+}
+
+.navLinkActive {
+  color: var(--maroon);
+}
+
+.navLinkActive::after {
+  width: 100%;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  padding: 4px;
+}
+
+.hamburgerLine {
+  width: 24px;
+  height: 2px;
+  background: var(--dark-gray);
+  transition: all var(--transition);
+}
+
+.mobileMenu {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  background: var(--white);
+  padding: 20px 40px;
+  box-shadow: 0 10px 30px var(--shadow-lg);
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobileMenuOpen {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .socialIcons {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
