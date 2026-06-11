@@ -13,6 +13,7 @@ export interface Property {
   isHottest?: boolean;
   description?: string;
   gallery?: string[];
+  loading?: 'lazy' | 'eager';
 }
 
 export const properties: Property[] = [
@@ -27,9 +28,10 @@ export const properties: Property[] = [
     baths: 4,
     squareFeet: 4200,
     levels: 2,
-    imageUrl: '/images/properties/b681be923ce507717609721d962bf859.jpg',
+    imageUrl: '/images/properties/b1.jpg',
     isHottest: true,
     description: 'Stunning modern villa with panoramic views and premium finishes throughout.',
+    loading: 'eager',
   },
   {
     id: 'b2',
@@ -42,7 +44,7 @@ export const properties: Property[] = [
     baths: 5,
     squareFeet: 5800,
     levels: 3,
-    imageUrl: '/images/properties/6519b25a5dbbe6387b0a7166bd777b9f.jpg',
+    imageUrl: '/images/properties/b2.jpg',
     isHottest: true,
     description: 'Executive mansion in a prime location with world-class amenities.',
   },
@@ -57,7 +59,7 @@ export const properties: Property[] = [
     baths: 3,
     squareFeet: 3500,
     levels: 2,
-    imageUrl: '/images/properties/e5a5867d525a48840580fbda5f5ca5e2.jpg',
+    imageUrl: '/images/properties/b3.jpg',
     isHottest: true,
     description: 'Smart home with cutting-edge technology and elegant contemporary design.',
   },
@@ -85,7 +87,7 @@ export const properties: Property[] = [
     baths: 4,
     squareFeet: 4000,
     levels: 2,
-    imageUrl: '/images/properties/a2a03dc0afecafc1a109b78fbc2e9d49.jpg',
+    imageUrl: '/images/properties/b5.jpg',
   },
   {
     id: 'b6',
@@ -98,7 +100,7 @@ export const properties: Property[] = [
     baths: 6,
     squareFeet: 6500,
     levels: 3,
-    imageUrl: '/images/properties/98b5b1cc83f98f5f6fb86bd37e96b3d5.jpg',
+    imageUrl: '/images/properties/b6.jpg',
   },
   {
     id: 'b7',
@@ -111,7 +113,8 @@ export const properties: Property[] = [
     baths: 2,
     squareFeet: 2200,
     levels: 2,
-    imageUrl: '/images/properties/d2cba2e57012191f80be7d71ed84a700.jpg',
+    imageUrl: '/images/properties/b7.jpg',
+    loading: 'eager',
   },
   {
     id: 'r1',
@@ -124,7 +127,7 @@ export const properties: Property[] = [
     baths: 2,
     squareFeet: 1800,
     levels: 1,
-    imageUrl: '/images/properties/a6c6fe23e8125dac7ba053cd7b43ea59.jpg',
+    imageUrl: '/images/properties/r1.jpg',
     isHottest: true,
     description: 'Fully furnished executive apartment with all modern conveniences.',
   },
@@ -139,7 +142,7 @@ export const properties: Property[] = [
     baths: 3,
     squareFeet: 2800,
     levels: 1,
-    imageUrl: '/images/properties/812d27281c74ad90a1f5715cc9beccce.jpg',
+    imageUrl: '/images/properties/r2.jpg',
     isHottest: true,
     description: 'Luxurious penthouse with city skyline views and premium finishes.',
   },
@@ -154,7 +157,7 @@ export const properties: Property[] = [
     baths: 2,
     squareFeet: 1400,
     levels: 1,
-    imageUrl: '/images/properties/360f36c6d50d95fccf4a99baa795d525.jpg',
+    imageUrl: '/images/properties/r3.jpg',
     isHottest: true,
     description: 'Charming garden flat in a serene neighborhood with lush surroundings.',
   },

@@ -22,7 +22,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             alt={property.title}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
-            loading="lazy"
+            loading={property.loading || "lazy"} 
             style={{ objectFit: 'cover' }}
           />
           <span className={property.type === 'buy' ? styles.tagBuy : styles.tagRent}>
