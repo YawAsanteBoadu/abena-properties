@@ -72,7 +72,7 @@ export const properties: Property[] = [
     baths: 4,
     squareFeet: 4800,
     levels: 2,
-    imageUrl: '/images/properties/bad798014ff4b37314a57d752b281320.jpg',
+    imageUrl: '/images/properties/b4.jpg',
   },
   {
     id: 'b5',
@@ -169,7 +169,7 @@ export const properties: Property[] = [
     baths: 1,
     squareFeet: 800,
     levels: 1,
-    imageUrl: '/images/properties/d35c3596cf6cb85405eaee13dee15a56.jpg',
+    imageUrl: '/images/properties/r4_2.jpg',
   },
   {
     id: 'r5',
@@ -182,7 +182,7 @@ export const properties: Property[] = [
     baths: 3,
     squareFeet: 3200,
     levels: 2,
-    imageUrl: '/images/properties/602f8577e14fb9d6f2a1d05ac99e89da.jpg',
+    imageUrl: '/images/properties/r5.jpg',
   },
   {
     id: 'r6',
@@ -195,7 +195,7 @@ export const properties: Property[] = [
     baths: 2,
     squareFeet: 2000,
     levels: 1,
-    imageUrl: '/images/properties/62c3897b8389ae8cc4e4a6f7049fae23.jpg',
+    imageUrl: '/images/properties/r6.jpg',
   },
   {
     id: 'r7',
@@ -208,7 +208,7 @@ export const properties: Property[] = [
     baths: 2,
     squareFeet: 1600,
     levels: 1,
-    imageUrl: '/images/properties/c2278720f0107c3f0f6d64cc28f25a41.jpg',
+    imageUrl: '/images/properties/r7.jpg',
   },
 ];
 
