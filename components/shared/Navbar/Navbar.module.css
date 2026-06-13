@@ -16,6 +16,25 @@
   transition: background var(--transition);
 }
 
+.logo {
+  position: relative;
+  display: inline-block;
+  width: 350px;
+  height: 250px;
+}
+
+.logoImage {
+  object-fit: contain;
+  object-position: left center;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    width: 320px;
+    height: 250px;
+  }
+}
+
 .navbarScrolled {
   background: var(--white);
   box-shadow: 0 2px 30px var(--shadow-lg);
@@ -104,33 +123,110 @@
 .hamburger {
   display: none;
   flex-direction: column;
+  justify-content: center;
   gap: 5px;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  border-radius: 12px;
   background: none;
-  padding: 4px;
+  padding: 0;
+  position: relative;
+  z-index: 1300;
+  transition: background var(--transition);
 }
 
 .hamburgerLine {
   width: 24px;
   height: 2px;
+  border-radius: 2px;
   background: var(--dark-gray);
-  transition: all var(--transition);
+  transition: transform var(--transition), opacity var(--transition), background var(--transition);
 }
 
-.mobileMenu {
-  display: none;
+/* Animate the three bars into an X when the menu is open */
+.hamburgerOpen {
+  background: rgba(128, 0, 32, 0.08);
+}
+
+.hamburgerOpen .hamburgerLine:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburgerOpen .hamburgerLine:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburgerOpen .hamburgerLine:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Full-screen scrim sits beneath the panel and above page content, so nothing
+   bleeds through. Tapping it closes the menu. */
+.scrim {
   position: fixed;
-  top: 70px;
-  left: 0;
-  width: 100%;
-  background: var(--white);
-  padding: 20px 40px;
-  box-shadow: 0 10px 30px var(--shadow-lg);
+  inset: 0;
+  z-index: 900;
+  background: rgba(20, 6, 10, 0.28);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition), visibility var(--transition);
+}
+
+.scrimOpen {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* iOS-style "liquid glass" panel */
+.mobileMenu {
+  position: fixed;
+  top: 82px;
+  left: 12px;
+  right: 12px;
+  z-index: 1200;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
   flex-direction: column;
-  gap: 16px;
+  gap: 6px;
+  /* hidden by default; revealed (and animated) when open */
+  display: flex;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.98);
+  transform-origin: top center;
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
 }
 
 .mobileMenuOpen {
-  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Make the in-panel links sit on their own subtle glass rows for legibility */
+.mobileMenu .navLink {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: background var(--transition), color var(--transition);
+}
+
+.mobileMenu .navLink::after {
+  display: none;
+}
+
+.mobileMenu .navLink:hover {
+  background: rgba(128, 0, 32, 0.08);
 }
 
 @media (max-width: 768px) {
@@ -149,4 +245,92 @@
   .hamburger {
     display: flex;
   }
+}
+
+/* ---- Services dropdown (pure CSS reveal) ---- */
+.dropdown {
+  position: relative;
+}
+
+.dropdownToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.caret {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 4px 0 4px;
+  border-color: currentColor transparent transparent transparent;
+  transition: transform var(--transition);
+}
+
+.dropdown:hover .caret,
+.dropdown:focus-within .caret {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 232px;
+  margin: 0;
+  padding: 8px 0;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px var(--shadow-lg);
+  list-style: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+  z-index: 1001;
+}
+
+.dropdown:hover .dropdownMenu,
+.dropdown:focus-within .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownItem {
+  display: block;
+  padding: 11px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dark-gray);
+  white-space: nowrap;
+  transition: background var(--transition), color var(--transition);
+}
+
+.dropdownItem:hover {
+  background: var(--off-white);
+  color: var(--maroon);
+}
+
+.dropdownItemActive {
+  color: var(--maroon);
+  font-weight: 600;
+}
+
+/* ---- Mobile services group ---- */
+.mobileGroupLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-top: 6px;
+}
+
+.mobileSubLink {
+  padding-left: 14px;
 }

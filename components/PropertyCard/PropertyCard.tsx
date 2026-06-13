@@ -13,6 +13,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     return type === 'rent' ? `$${formatted}/mo` : `$${formatted}`;
   };
 
+  const isDistress = property.category === 'distress';
+  const tagClass = isDistress ? styles.tagDistress : property.type === 'buy' ? styles.tagBuy : styles.tagRent;
+  const tagLabel = isDistress ? 'DISTRESS' : property.type === 'buy' ? 'BUY' : 'RENT';
+
   return (
     <Link href={`/properties/${property.id}`} className={styles.cardLink}>
       <div className={styles.cardWrapper}>
@@ -22,17 +26,20 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             alt={property.title}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
-            loading={property.loading || "lazy"} 
+            loading="lazy"
             style={{ objectFit: 'cover' }}
           />
-          <span className={property.type === 'buy' ? styles.tagBuy : styles.tagRent}>
-            {property.type === 'buy' ? 'BUY' : 'RENT'}
-          </span>
+          <span className={tagClass}>{tagLabel}</span>
         </div>
         <div className={styles.cardBody}>
           <h3 className={styles.title}>{property.title}</h3>
           <p className={styles.location}>{property.location}, {property.city}</p>
-          <p className={styles.price}>{formatPrice(property.price, property.type)}</p>
+          <p className={styles.price}>
+            {formatPrice(property.price, property.type)}
+            {isDistress && property.originalPrice ? (
+              <span className={styles.originalPrice}>${property.originalPrice.toLocaleString()}</span>
+            ) : null}
+          </p>
           <div className={styles.specs}>
             <span>{property.bedrooms} Beds</span>
             <span className={styles.specDivider} />
