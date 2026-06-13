@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import styles from './Footer.module.css';
-import { BRAND, NAV_LINKS } from '@/data/constants';
+import { BRAND, NAV_LINKS, SERVICE_LINKS } from '@/data/constants';
 
 export default function Footer() {
   return (
@@ -19,6 +19,16 @@ export default function Footer() {
             <h4>Navigation</h4>
             <ul>
               {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>{link.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className={styles.footerCol}>
+            <h4>Services</h4>
+            <ul>
+              {SERVICE_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href}>{link.label}</Link>
                 </li>
