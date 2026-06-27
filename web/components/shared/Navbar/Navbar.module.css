@@ -120,6 +120,12 @@
   width: 100%;
 }
 
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .hamburger {
   display: none;
   flex-direction: column;
@@ -229,9 +235,14 @@
   background: rgba(128, 0, 32, 0.08);
 }
 
+.mobileMenu .callButton {
+  margin-top: 8px;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .navbar {
-    padding: 0 20px;
+    padding: 28px;
   }
 
   .navLinks {
@@ -333,4 +344,36 @@
 
 .mobileSubLink {
   padding-left: 14px;
+}
+
+/* Call button inside the mobile menu — styled as a full-width pill row */
+.mobileMenu .callButtonWrapper {
+  display: flex;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(128, 0, 32, 0.1);
+}
+
+.mobileMenu .callButtonWrapper a,
+.mobileMenu .callButtonWrapper button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 12px;
+  background: rgba(128, 0, 32, 0.08);
+  border: 1px solid rgba(128, 0, 32, 0.18);
+  color: var(--maroon);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.mobileMenu .callButtonWrapper a:hover,
+.mobileMenu .callButtonWrapper button:hover {
+  background: rgba(128, 0, 32, 0.14);
+  border-color: rgba(128, 0, 32, 0.3);
 }

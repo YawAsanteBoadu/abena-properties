@@ -3,17 +3,41 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { apiFetch, getApiUrl } from './api';
+import { apiFetch, getAuthToken } from './api';
+import { ApiError, getApiUrl } from './api-error';
 import type { Listing, LoginResponse, CreateListingData } from './types';
 
-export async function loginAction(formData: FormData) {
+export type ActionResult<T = void> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; fieldErrors?: Record<string, string> };
+
+function fail(err: unknown): ActionResult<never> {
+  if (err instanceof ApiError) {
+    return { ok: false, error: err.message, fieldErrors: err.fieldErrors };
+  }
+  if (err instanceof Error) {
+    return { ok: false, error: err.message };
+  }
+  return { ok: false, error: 'An unexpected error occurred.' };
+}
+
+export async function loginAction(formData: FormData): Promise<ActionResult> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
-  const data = await apiFetch<LoginResponse>('/api/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  });
+  if (!email || !password) {
+    return { ok: false, error: 'Email and password are required.' };
+  }
+
+  let data: LoginResponse;
+  try {
+    data = await apiFetch<LoginResponse>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (err) {
+    return fail(err);
+  }
 
   const cookieStore = await cookies();
   cookieStore.set('auth_token', data.token, {
@@ -33,61 +57,102 @@ export async function logoutAction() {
   redirect('/login');
 }
 
-export async function createListingAction(data: CreateListingData): Promise<Listing> {
-  const listing = await apiFetch<Listing>('/api/admin/listings', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-  revalidatePath('/listings');
-  return listing;
-}
-
-export async function updateListingAction(id: string, data: CreateListingData): Promise<Listing> {
-  const listing = await apiFetch<Listing>(`/api/admin/listings/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
-  revalidatePath('/listings');
-  revalidatePath(`/listings/${id}/edit`);
-  return listing;
-}
-
-export async function deleteListingAction(id: string) {
-  await apiFetch(`/api/admin/listings/${id}`, { method: 'DELETE' });
-  revalidatePath('/listings');
-}
-
-export async function toggleStatusAction(id: string, status: string) {
-  await apiFetch(`/api/admin/listings/${id}/status`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status }),
-  });
-  revalidatePath('/listings');
-}
-
-export async function uploadImagesAction(listingId: string, formData: FormData) {
-  const token = (await cookies()).get('auth_token')?.value;
-  const apiUrl = getApiUrl();
-
-  const res = await fetch(`${apiUrl}/api/admin/listings/${listingId}/images`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(body.error || 'Upload failed');
+export async function createListingAction(data: CreateListingData): Promise<ActionResult<Listing>> {
+  try {
+    const listing = await apiFetch<Listing>('/api/admin/listings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    revalidatePath('/listings');
+    return { ok: true, data: listing };
+  } catch (err) {
+    return fail(err);
   }
-
-  revalidatePath(`/listings/${listingId}/edit`);
-  return res.json();
 }
 
-export async function deleteImageAction(imageId: number) {
-  await apiFetch(`/api/admin/images/${imageId}`, { method: 'DELETE' });
+export async function updateListingAction(id: string, data: CreateListingData): Promise<ActionResult<Listing>> {
+  try {
+    const listing = await apiFetch<Listing>(`/api/admin/listings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    revalidatePath('/listings');
+    revalidatePath(`/listings/${id}/edit`);
+    return { ok: true, data: listing };
+  } catch (err) {
+    return fail(err);
+  }
 }
 
-export async function setPrimaryImageAction(imageId: number) {
-  await apiFetch(`/api/admin/images/${imageId}/primary`, { method: 'PATCH' });
+export async function deleteListingAction(id: string): Promise<ActionResult> {
+  try {
+    await apiFetch(`/api/admin/listings/${id}`, { method: 'DELETE' });
+    revalidatePath('/listings');
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function toggleStatusAction(id: string, status: string): Promise<ActionResult> {
+  try {
+    await apiFetch(`/api/admin/listings/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+    revalidatePath('/listings');
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function uploadImagesAction(listingId: string, formData: FormData): Promise<ActionResult<unknown>> {
+  try {
+    const token = await getAuthToken();
+    const apiUrl = getApiUrl();
+
+    const res = await fetch(`${apiUrl}/api/admin/listings/${listingId}/images`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+
+    if (!res.ok) {
+      let body: { error?: string; code?: string };
+      try {
+        body = await res.json();
+      } catch {
+        body = { error: res.statusText };
+      }
+      return { ok: false, error: body.error || `Upload failed (${res.status})` };
+    }
+
+    const data = await res.json();
+    revalidatePath(`/listings/${listingId}/edit`);
+    return { ok: true, data };
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('fetch')) {
+      return { ok: false, error: 'Could not reach the server. Please check your connection and try again.' };
+    }
+    return fail(err);
+  }
+}
+
+export async function deleteImageAction(imageId: number): Promise<ActionResult> {
+  try {
+    await apiFetch(`/api/admin/images/${imageId}`, { method: 'DELETE' });
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function setPrimaryImageAction(imageId: number): Promise<ActionResult> {
+  try {
+    await apiFetch(`/api/admin/images/${imageId}/primary`, { method: 'PATCH' });
+    return { ok: true, data: undefined };
+  } catch (err) {
+    return fail(err);
+  }
 }

@@ -50,6 +50,15 @@
   cursor: not-allowed;
 }
 
+.uploadError {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--red-light);
+  color: var(--red);
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

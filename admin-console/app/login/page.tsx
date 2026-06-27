@@ -1,13 +1,34 @@
+'use client';
+
+import { useState, useTransition } from 'react';
 import { loginAction } from '@/lib/actions';
 import styles from './page.module.css';
 
 export default function LoginPage() {
+  const [error, setError] = useState('');
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError('');
+
+    const formData = new FormData(e.currentTarget);
+
+    startTransition(async () => {
+      const result = await loginAction(formData);
+      if (result && !result.ok) {
+        setError(result.error);
+      }
+    });
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <div className={styles.logo}>Abena Properties</div>
         <h1 className={styles.title}>Admin Login</h1>
-        <form action={loginAction} className={styles.form}>
+        {error && <div className={styles.error}>{error}</div>}
+        <form onSubmit={handleSubmit} className={styles.form}>
           <label className={styles.label}>
             Email
             <input
@@ -28,8 +49,8 @@ export default function LoginPage() {
               placeholder="Enter password"
             />
           </label>
-          <button type="submit" className={styles.button}>
-            Sign In
+          <button type="submit" className={styles.button} disabled={isPending}>
+            {isPending ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
       </div>

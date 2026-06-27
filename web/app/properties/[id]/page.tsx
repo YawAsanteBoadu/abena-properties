@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import PropertyGallery from '@/components/property/PropertyGallery/PropertyGallery';
 import VideoFacade from '@/components/property/VideoFacade/VideoFacade';
+import CallButton from '@/components/shared/CallButton/CallButton';
+import WhatsAppButton from '@/components/shared/WhatsAppButton/WhatsAppButton';
 import { getAllListingIds, getPropertyById, getPropertyGallery } from '@/data/properties';
-import { BRAND } from '@/data/constants';
 import styles from '@/styles/PropertyDetail.module.css';
 
 type Params = { id: string };
@@ -44,12 +45,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
   }
 
   const gallery = getPropertyGallery(property);
-  const whatsappUrl = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(
-    `Hello Abena Properties! I am interested in "${property.title}" (${formatPrice(
-      property.price,
-      property.type,
-    )}). Please share more details.`,
-  )}`;
+  const categoryLabel = property.category === 'buy' ? 'Buy' : property.category === 'rent' ? 'Rent' : property.category === 'distress' ? 'Distress Sale' : property.category;
 
   return (
     <article className={styles.page}>
@@ -113,9 +109,14 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
             <li>Vetted and ready for viewing</li>
           </ul>
 
-          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={styles.cta}>
-            Enquire on WhatsApp
-          </a>
+          <div className={styles.ctaGroup}>
+            <WhatsAppButton
+              propertyTitle={property.title}
+              propertyCategory={categoryLabel}
+              propertyId={property.id}
+            />
+            <CallButton variant="cta" />
+          </div>
         </section>
 
         {/* Card 2 — video facade (lazy / JIT). No video bytes load until click.

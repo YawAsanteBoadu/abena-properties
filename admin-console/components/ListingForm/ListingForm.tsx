@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createListingAction, updateListingAction } from '@/lib/actions';
+import { useToast } from '@/components/Toast/ToastContext';
 import type { Listing, Category, CreateListingData } from '@/lib/types';
 import styles from './ListingForm.module.css';
 
@@ -20,17 +21,24 @@ const CATEGORIES: { value: Category; label: string }[] = [
 
 export default function ListingForm({ listing }: ListingFormProps) {
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [category, setCategory] = useState<Category>(listing?.category || 'buy');
 
   const isProperty = ['buy', 'rent', 'distress'].includes(category);
   const isLand = category === 'land';
   const isProject = category === 'project';
 
+  function fieldError(name: string): string | undefined {
+    return fieldErrors[name];
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
 
     const form = new FormData(e.currentTarget);
     const data: CreateListingData = {
@@ -73,17 +81,20 @@ export default function ListingForm({ listing }: ListingFormProps) {
     }
 
     startTransition(async () => {
-      try {
-        if (listing) {
-          await updateListingAction(listing.id, data);
-        } else {
-          await createListingAction(data);
-        }
-        router.push('/listings');
-        router.refresh();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Something went wrong');
+      const result = listing
+        ? await updateListingAction(listing.id, data)
+        : await createListingAction(data);
+
+      if (!result.ok) {
+        setError(result.error);
+        if (result.fieldErrors) setFieldErrors(result.fieldErrors);
+        showError(result.error);
+        return;
       }
+
+      showSuccess(listing ? 'Listing updated.' : 'Listing created.');
+      router.push('/listings');
+      router.refresh();
     });
   }
 
@@ -98,14 +109,15 @@ export default function ListingForm({ listing }: ListingFormProps) {
               name="title"
               required
               defaultValue={listing?.title}
-              className={styles.input}
+              className={`${styles.input} ${fieldError('title') ? styles.inputError : ''}`}
               placeholder="Property title"
             />
+            {fieldError('title') && <span className={styles.fieldError}>{fieldError('title')}</span>}
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Category</label>
             <select
-              className={styles.select}
+              className={`${styles.select} ${fieldError('category') ? styles.inputError : ''}`}
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
             >
@@ -113,6 +125,7 @@ export default function ListingForm({ listing }: ListingFormProps) {
                 <option key={c.value} value={c.value}>{c.label}</option>
               ))}
             </select>
+            {fieldError('category') && <span className={styles.fieldError}>{fieldError('category')}</span>}
           </div>
         </div>
 
@@ -123,9 +136,10 @@ export default function ListingForm({ listing }: ListingFormProps) {
               name="location"
               required
               defaultValue={listing?.location}
-              className={styles.input}
+              className={`${styles.input} ${fieldError('location') ? styles.inputError : ''}`}
               placeholder="e.g. East Legon"
             />
+            {fieldError('location') && <span className={styles.fieldError}>{fieldError('location')}</span>}
           </div>
           <div className={styles.field}>
             <label className={styles.label}>City</label>
@@ -133,9 +147,10 @@ export default function ListingForm({ listing }: ListingFormProps) {
               name="city"
               required
               defaultValue={listing?.city}
-              className={styles.input}
+              className={`${styles.input} ${fieldError('city') ? styles.inputError : ''}`}
               placeholder="e.g. Accra"
             />
+            {fieldError('city') && <span className={styles.fieldError}>{fieldError('city')}</span>}
           </div>
         </div>
 
@@ -147,17 +162,23 @@ export default function ListingForm({ listing }: ListingFormProps) {
               type="number"
               step="0.01"
               defaultValue={listing?.price}
-              className={styles.input}
+              className={`${styles.input} ${fieldError('price') ? styles.inputError : ''}`}
               placeholder={category === 'rent' ? 'Monthly rent' : 'Sale price'}
             />
+            {fieldError('price') && <span className={styles.fieldError}>{fieldError('price')}</span>}
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Status</label>
-            <select name="status" className={styles.select} defaultValue={listing?.status || 'draft'}>
+            <select
+              name="status"
+              className={`${styles.select} ${fieldError('status') ? styles.inputError : ''}`}
+              defaultValue={listing?.status || 'draft'}
+            >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
               <option value="archived">Archived</option>
             </select>
+            {fieldError('status') && <span className={styles.fieldError}>{fieldError('status')}</span>}
           </div>
         </div>
 
@@ -181,11 +202,23 @@ export default function ListingForm({ listing }: ListingFormProps) {
             <div className={styles.row3}>
               <div className={styles.field}>
                 <label className={styles.label}>Bedrooms</label>
-                <input name="bedrooms" type="number" defaultValue={listing?.bedrooms} className={styles.input} />
+                <input
+                  name="bedrooms"
+                  type="number"
+                  defaultValue={listing?.bedrooms}
+                  className={`${styles.input} ${fieldError('bedrooms') ? styles.inputError : ''}`}
+                />
+                {fieldError('bedrooms') && <span className={styles.fieldError}>{fieldError('bedrooms')}</span>}
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Bathrooms</label>
-                <input name="baths" type="number" defaultValue={listing?.baths} className={styles.input} />
+                <input
+                  name="baths"
+                  type="number"
+                  defaultValue={listing?.baths}
+                  className={`${styles.input} ${fieldError('baths') ? styles.inputError : ''}`}
+                />
+                {fieldError('baths') && <span className={styles.fieldError}>{fieldError('baths')}</span>}
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Sq Ft</label>
@@ -227,8 +260,9 @@ export default function ListingForm({ listing }: ListingFormProps) {
                 min="0"
                 max="100"
                 defaultValue={listing?.completion}
-                className={styles.input}
+                className={`${styles.input} ${fieldError('completion') ? styles.inputError : ''}`}
               />
+              {fieldError('completion') && <span className={styles.fieldError}>{fieldError('completion')}</span>}
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Expected Completion</label>

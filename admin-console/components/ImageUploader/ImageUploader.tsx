@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { uploadImagesAction, deleteImageAction, setPrimaryImageAction } from '@/lib/actions';
+import { useToast } from '@/components/Toast/ToastContext';
 import type { ListingImage } from '@/lib/types';
 import styles from './ImageUploader.module.css';
 
@@ -20,23 +21,35 @@ interface ImageUploaderProps {
 
 export default function ImageUploader({ listingId, images }: ImageUploaderProps) {
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   function handleUpload() {
     const files = fileRef.current?.files;
     if (!files || files.length === 0) return;
 
     setUploading(true);
+    setUploadError('');
     const formData = new FormData();
     Array.from(files).forEach((f) => formData.append('images', f));
 
     startTransition(async () => {
       try {
-        await uploadImagesAction(listingId, formData);
-        if (fileRef.current) fileRef.current.value = '';
-        router.refresh();
+        const result = await uploadImagesAction(listingId, formData);
+        if (!result.ok) {
+          setUploadError(result.error);
+          showError(result.error);
+        } else {
+          showSuccess(`${files.length} image${files.length > 1 ? 's' : ''} uploaded.`);
+          if (fileRef.current) fileRef.current.value = '';
+          router.refresh();
+        }
+      } catch {
+        setUploadError('Upload failed unexpectedly.');
+        showError('Upload failed unexpectedly.');
       } finally {
         setUploading(false);
       }
@@ -46,36 +59,55 @@ export default function ImageUploader({ listingId, images }: ImageUploaderProps)
   function handleDelete(imageId: number) {
     if (!confirm('Delete this image?')) return;
     startTransition(async () => {
-      await deleteImageAction(imageId);
-      router.refresh();
+      const result = await deleteImageAction(imageId);
+      if (!result.ok) {
+        showError(result.error);
+      } else {
+        showSuccess('Image deleted.');
+        router.refresh();
+      }
     });
   }
 
   function handleSetPrimary(imageId: number) {
     startTransition(async () => {
-      await setPrimaryImageAction(imageId);
-      router.refresh();
+      const result = await setPrimaryImageAction(imageId);
+      if (!result.ok) {
+        showError(result.error);
+      } else {
+        showSuccess('Primary image updated.');
+        router.refresh();
+      }
     });
   }
+
+  const busy = uploading || isPending;
 
   return (
     <section className={styles.section}>
       <h2 className={styles.heading}>Images</h2>
 
-      <div className={styles.uploadArea} onClick={() => fileRef.current?.click()}>
+      <div className={styles.uploadArea} onClick={() => !busy && fileRef.current?.click()}>
         <input
           ref={fileRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
           multiple
           hidden
           onChange={handleUpload}
+          disabled={busy}
         />
-        <p className={styles.uploadText}>Click or drag images here to upload</p>
-        <button type="button" className={styles.uploadBtn} disabled={uploading || isPending}>
-          {uploading ? 'Uploading...' : 'Choose Files'}
+        <p className={styles.uploadText}>
+          {busy ? 'Uploading...' : 'Click or drag images here to upload'}
+        </p>
+        <button type="button" className={styles.uploadBtn} disabled={busy}>
+          {busy ? 'Uploading...' : 'Choose Files'}
         </button>
       </div>
+
+      {uploadError && (
+        <div className={styles.uploadError}>{uploadError}</div>
+      )}
 
       {images.length > 0 && (
         <div className={styles.grid}>
@@ -94,11 +126,11 @@ export default function ImageUploader({ listingId, images }: ImageUploaderProps)
               />
               <div className={styles.imageActions}>
                 {!img.isPrimary && (
-                  <button className={styles.imgBtn} onClick={() => handleSetPrimary(img.id)}>
+                  <button className={styles.imgBtn} onClick={() => handleSetPrimary(img.id)} disabled={busy}>
                     Primary
                   </button>
                 )}
-                <button className={styles.imgBtn} onClick={() => handleDelete(img.id)}>
+                <button className={styles.imgBtn} onClick={() => handleDelete(img.id)} disabled={busy}>
                   Delete
                 </button>
               </div>
