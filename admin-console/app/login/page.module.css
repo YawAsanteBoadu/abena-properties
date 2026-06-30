@@ -17,11 +17,9 @@
 }
 
 .logo {
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--maroon);
-  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
 }
 
 .title {

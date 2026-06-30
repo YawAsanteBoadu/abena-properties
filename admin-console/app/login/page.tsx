@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { loginAction } from '@/lib/actions';
 import styles from './page.module.css';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [error, setError] = useState('');
@@ -25,7 +26,16 @@ export default function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <div className={styles.logo}>Abena Properties</div>
+        <div className={styles.logo}>
+          <Image
+            src="/AbProperties_logo.png"
+            alt="Abena Properties"
+            width={220}
+            height={80}
+            priority
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
         <h1 className={styles.title}>Admin Login</h1>
         {error && <div className={styles.error}>{error}</div>}
         <form onSubmit={handleSubmit} className={styles.form}>
