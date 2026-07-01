@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import PropertyGallery from '@/components/property/PropertyGallery/PropertyGallery';
 import VideoFacade from '@/components/property/VideoFacade/VideoFacade';
-import { properties, getPropertyById, getPropertyGallery } from '@/data/properties';
+import { getAllListingIds, getPropertyById, getPropertyGallery } from '@/data/properties';
 import { BRAND } from '@/data/constants';
 import styles from '@/styles/PropertyDetail.module.css';
 
@@ -11,8 +11,9 @@ type Params = { id: string };
 
 // Pre-render every property page at build time (static generation = best
 // crawlability and performance).
-export function generateStaticParams(): Params[] {
-  return properties.map((p) => ({ id: p.id }));
+export async function generateStaticParams(): Promise<Params[]> {
+  const ids = await getAllListingIds();
+  return ids.map((id) => ({ id }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
