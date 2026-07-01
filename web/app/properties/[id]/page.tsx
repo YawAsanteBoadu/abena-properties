@@ -9,6 +9,7 @@ import { getAllListingIds, getPropertyById, getPropertyGallery } from '@/data/pr
 import styles from '@/styles/PropertyDetail.module.css';
 
 type Params = { id: string };
+export const dynamicParams = true;
 
 // Pre-render every property page at build time (static generation = best
 // crawlability and performance).

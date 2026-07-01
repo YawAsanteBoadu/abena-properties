@@ -3,6 +3,8 @@ import { getProperties } from '@/data/properties';
 import styles from '@/styles/Listings.module.css';
 import PropertiesExplorer from './PropertiesExplorer';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Properties',
   description: 'Browse all premium property listings for buying and renting.',

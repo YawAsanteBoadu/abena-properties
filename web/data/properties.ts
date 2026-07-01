@@ -99,9 +99,13 @@ function mapProject(item: Record<string, unknown>): Project {
 }
 
 async function fetchApi<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  try {
+    const res = await fetch(`${API_URL}${path}`, { next: { revalidate: 60 } });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  } catch {
+    return [] as unknown as T;
+  }
 }
 
 export async function getProperties(): Promise<Property[]> {
@@ -152,8 +156,12 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getAllListingIds(): Promise<string[]> {
-  const data = await fetchApi<Record<string, unknown>[]>('/api/listings');
-  return data.map((d) => d.id as string);
+  try {
+    const data = await fetchApi<Record<string, unknown>[]>('/api/listings');
+    return data.map((d) => d.id as string);
+  } catch {
+    return [];
+  }
 }
 
 export const testimonials = [

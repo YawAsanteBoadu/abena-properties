@@ -7,6 +7,8 @@ import CallToActionSection from '@/components/home/CallToActionSection/CallToAct
 import SalesPitchSection from '@/components/home/SalesPitchSection/SalesPitchSection';
 import { getHottestProperties } from '@/data/properties';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const [buyProperties, rentProperties] = await Promise.all([
     getHottestProperties('buy'),
