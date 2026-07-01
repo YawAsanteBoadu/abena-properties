@@ -1,13 +1,54 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import multer from 'multer';
 import { nanoid } from 'nanoid';
 import { getAll, getOne, runQuery, runInsert } from '../../config/database';
 import { requireAuth } from '../../middleware/auth';
+import { asyncHandler } from '../../middleware/asyncHandler';
 import { ListingRow, ListingImageRow, CreateListingBody } from '../../types';
 import { formatListing } from '../listings';
-import { deleteListingImages } from '../../services/imageService';
+import { deleteListingImages, processAndSaveImage } from '../../services/imageService';
 
 const router = Router();
 router.use(requireAuth);
+
+const VALID_CATEGORIES = ['buy', 'rent', 'land', 'project', 'distress'];
+const VALID_STATUSES = ['draft', 'published', 'archived'];
+
+interface FieldErrors {
+  [field: string]: string;
+}
+
+function validateListingBody(body: CreateListingBody, requireAll: boolean): FieldErrors {
+  const errors: FieldErrors = {};
+
+  if (requireAll) {
+    if (!body.title?.trim()) errors.title = 'Title is required.';
+    if (!body.location?.trim()) errors.location = 'Location is required.';
+    if (!body.city?.trim()) errors.city = 'City is required.';
+    if (!body.category) errors.category = 'Category is required.';
+  }
+
+  if (body.category && !VALID_CATEGORIES.includes(body.category)) {
+    errors.category = `Invalid category. Must be one of: ${VALID_CATEGORIES.join(', ')}.`;
+  }
+  if (body.status && !VALID_STATUSES.includes(body.status)) {
+    errors.status = `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}.`;
+  }
+  if (body.price !== undefined && body.price !== null && body.price < 0) {
+    errors.price = 'Price cannot be negative.';
+  }
+  if (body.bedrooms !== undefined && body.bedrooms !== null && body.bedrooms < 0) {
+    errors.bedrooms = 'Bedrooms cannot be negative.';
+  }
+  if (body.baths !== undefined && body.baths !== null && body.baths < 0) {
+    errors.baths = 'Bathrooms cannot be negative.';
+  }
+  if (body.completion !== undefined && body.completion !== null && (body.completion < 0 || body.completion > 100)) {
+    errors.completion = 'Completion must be between 0 and 100.';
+  }
+
+  return errors;
+}
 
 router.get('/', (_req: Request, res: Response) => {
   const listings = getAll<ListingRow>(
@@ -28,7 +69,7 @@ router.get('/', (_req: Request, res: Response) => {
 router.get('/:id', (req: Request, res: Response) => {
   const listing = getOne<ListingRow>('SELECT * FROM listings WHERE id = ?', [req.params.id]);
   if (!listing) {
-    res.status(404).json({ error: 'Listing not found' });
+    res.status(404).json({ error: 'Listing not found', code: 'NOT_FOUND' });
     return;
   }
   const images = getAll<ListingImageRow>(
@@ -41,8 +82,13 @@ router.get('/:id', (req: Request, res: Response) => {
 router.post('/', (req: Request, res: Response) => {
   const body: CreateListingBody = req.body;
 
-  if (!body.title || !body.location || !body.city || !body.category) {
-    res.status(400).json({ error: 'title, location, city, and category are required' });
+  const fieldErrors = validateListingBody(body, true);
+  if (Object.keys(fieldErrors).length > 0) {
+    res.status(400).json({
+      error: 'Validation failed',
+      code: 'VALIDATION_ERROR',
+      details: fieldErrors,
+    });
     return;
   }
 
@@ -71,7 +117,17 @@ router.put('/:id', (req: Request, res: Response) => {
 
   const existing = getOne<ListingRow>('SELECT * FROM listings WHERE id = ?', [id]);
   if (!existing) {
-    res.status(404).json({ error: 'Listing not found' });
+    res.status(404).json({ error: 'Listing not found', code: 'NOT_FOUND' });
+    return;
+  }
+
+  const fieldErrors = validateListingBody(body, false);
+  if (Object.keys(fieldErrors).length > 0) {
+    res.status(400).json({
+      error: 'Validation failed',
+      code: 'VALIDATION_ERROR',
+      details: fieldErrors,
+    });
     return;
   }
 
@@ -117,7 +173,7 @@ router.delete('/:id', (req: Request, res: Response) => {
 
   const existing = getOne<ListingRow>('SELECT * FROM listings WHERE id = ?', [id]);
   if (!existing) {
-    res.status(404).json({ error: 'Listing not found' });
+    res.status(404).json({ error: 'Listing not found', code: 'NOT_FOUND' });
     return;
   }
 
@@ -130,14 +186,18 @@ router.patch('/:id/status', (req: Request, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  if (!status || !['draft', 'published', 'archived'].includes(status)) {
-    res.status(400).json({ error: 'status must be draft, published, or archived' });
+  if (!status || !VALID_STATUSES.includes(status)) {
+    res.status(400).json({
+      error: `Status must be one of: ${VALID_STATUSES.join(', ')}.`,
+      code: 'VALIDATION_ERROR',
+      details: { status: `Invalid status "${status}".` },
+    });
     return;
   }
 
   const existing = getOne<ListingRow>('SELECT * FROM listings WHERE id = ?', [id]);
   if (!existing) {
-    res.status(404).json({ error: 'Listing not found' });
+    res.status(404).json({ error: 'Listing not found', code: 'NOT_FOUND' });
     return;
   }
 
@@ -149,5 +209,70 @@ router.patch('/:id/status', (req: Request, res: Response) => {
   );
   res.json(formatListing(updated, images));
 });
+
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024, files: 20 },
+  fileFilter(_req, file, cb) {
+    if (ALLOWED_MIMES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type "${file.mimetype}". Allowed: JPEG, PNG, WebP, GIF, AVIF.`));
+    }
+  },
+});
+
+router.post(
+  '/:id/images',
+  (req: Request, res: Response, next: NextFunction) => {
+    upload.array('images', 20)(req, res, (err) => {
+      if (err) return next(err);
+      next();
+    });
+  },
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const listing = getOne<ListingRow>('SELECT * FROM listings WHERE id = ?', [id]);
+    if (!listing) {
+      res.status(404).json({ error: 'Listing not found', code: 'NOT_FOUND' });
+      return;
+    }
+
+    const files = req.files as Express.Multer.File[];
+    if (!files || files.length === 0) {
+      res.status(400).json({ error: 'No images provided', code: 'VALIDATION_ERROR' });
+      return;
+    }
+
+    const existing = getAll<ListingImageRow>(
+      'SELECT * FROM listing_images WHERE listing_id = ?', [id]
+    );
+    const existingCount = existing.length;
+
+    const results = [];
+    for (let i = 0; i < files.length; i++) {
+      const filename = await processAndSaveImage(files[i].buffer, id);
+      const isPrimary = existingCount === 0 && i === 0 ? 1 : 0;
+      const sortOrder = existingCount + i;
+
+      const lastId = runInsert(
+        'INSERT INTO listing_images (listing_id, filename, sort_order, is_primary) VALUES (?, ?, ?, ?)',
+        [id, filename, sortOrder, isPrimary]
+      );
+      results.push({
+        id: lastId,
+        filename,
+        url: `/uploads/${id}/${filename}`,
+        sortOrder,
+        isPrimary: isPrimary === 1,
+      });
+    }
+
+    res.status(201).json(results);
+  })
+);
 
 export default router;

@@ -17,11 +17,9 @@
 }
 
 .logo {
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--maroon);
-  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
 }
 
 .title {
@@ -74,4 +72,19 @@
 
 .button:hover {
   background: var(--maroon-dark);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  padding: 0.625rem 0.75rem;
+  background: var(--red-light);
+  color: var(--red);
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }

@@ -1,9 +1,12 @@
 'use client';
 
+import { useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { deleteListingAction, toggleStatusAction } from '@/lib/actions';
+import { useToast } from '@/components/Toast/ToastContext';
+import ConfirmDialog from '@/components/ConfirmDialog/ConfirmDialog';
 import type { Listing } from '@/lib/types';
 import StatusBadge from '@/components/StatusBadge/StatusBadge';
 import styles from './ListingTable.module.css';
@@ -16,17 +19,40 @@ function fullUrl(path: string) {
 
 export default function ListingTable({ listings }: { listings: Listing[] }) {
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
+  const [isPending, startTransition] = useTransition();
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
 
-  async function handleDelete(id: string) {
-    if (!confirm('Delete this listing permanently?')) return;
-    await deleteListingAction(id);
-    router.refresh();
+  function requestDelete(id: string, title: string) {
+    setPendingDelete({ id, title });
   }
 
-  async function handleToggle(id: string, current: string) {
+  function confirmDelete() {
+    if (!pendingDelete) return;
+    const { id, title } = pendingDelete;
+    startTransition(async () => {
+      const result = await deleteListingAction(id);
+      if (!result.ok) {
+        showError(result.error); // keep the dialog open so they can retry or cancel
+      } else {
+        showSuccess(`"${title}" deleted.`);
+        setPendingDelete(null);
+        router.refresh();
+      }
+    });
+  }
+
+  function handleToggle(id: string, current: string) {
     const next = current === 'published' ? 'draft' : 'published';
-    await toggleStatusAction(id, next);
-    router.refresh();
+    startTransition(async () => {
+      const result = await toggleStatusAction(id, next);
+      if (!result.ok) {
+        showError(result.error);
+      } else {
+        showSuccess(`Status changed to ${next}.`);
+        router.refresh();
+      }
+    });
   }
 
   return (
@@ -71,12 +97,14 @@ export default function ListingTable({ listings }: { listings: Listing[] }) {
                   <button
                     className={styles.statusBtn}
                     onClick={() => handleToggle(l.id, l.status)}
+                    disabled={isPending}
                   >
                     {l.status === 'published' ? 'Unpublish' : 'Publish'}
                   </button>
                   <button
                     className={styles.deleteBtn}
-                    onClick={() => handleDelete(l.id)}
+                    onClick={() => requestDelete(l.id, l.title)}
+                    disabled={isPending}
                   >
                     Delete
                   </button>
@@ -86,6 +114,25 @@ export default function ListingTable({ listings }: { listings: Listing[] }) {
           ))}
         </tbody>
       </table>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        variant="danger"
+        title="Delete listing"
+        message={
+          pendingDelete ? (
+            <>
+              Delete <strong>{pendingDelete.title}</strong> permanently? This also
+              removes its images and can&apos;t be undone.
+            </>
+          ) : null
+        }
+        confirmLabel="Delete listing"
+        cancelLabel="Cancel"
+        loading={isPending}
+        onConfirm={confirmDelete}
+        onCancel={() => { if (!isPending) setPendingDelete(null); }}
+      />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 import { NAV_LINKS, SERVICE_LINKS, BRAND } from '@/data/constants';
+import CallButton from '@/components/shared/CallButton/CallButton';
+import SearchTrigger from '@/components/Search/SearchTrigger';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -95,6 +97,10 @@ export default function Navbar() {
           ))}
         </ul>
 
+        <div className={styles.navActions}>
+          <SearchTrigger />
+        </div>
+
         <button
           className={`${styles.hamburger} ${mobileOpen ? styles.hamburgerOpen : ''}`}
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -149,6 +155,10 @@ export default function Navbar() {
             {link.label}
           </Link>
         ))}
+        <div className={styles.callButtonWrapper}>
+          <CallButton
+          />
+        </div>
       </div>
     </>
   );

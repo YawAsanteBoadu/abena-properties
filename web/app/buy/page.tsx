@@ -5,6 +5,8 @@ import { getPropertiesByType } from '@/data/properties';
 import { BRAND } from '@/data/constants';
 import styles from '@/styles/Listings.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Buy',
   description: 'Premium properties available for purchase in Ghana.',

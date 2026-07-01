@@ -119,4 +119,24 @@
   color: var(--red);
   border-radius: var(--radius);
   font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.inputError {
+  border-color: var(--red) !important;
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: var(--red);
+  margin-top: 0.125rem;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

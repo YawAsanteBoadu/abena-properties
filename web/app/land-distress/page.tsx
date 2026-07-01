@@ -4,6 +4,8 @@ import PropertyCard from '@/components/PropertyCard/PropertyCard';
 import { getLands, getDistressSales } from '@/data/properties';
 import styles from '@/styles/LandDistress.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Land & Distress Sales',
   description:

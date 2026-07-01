@@ -146,20 +146,10 @@
   font-weight: 700;
 }
 
-.cta {
-  display: inline-block;
-  padding: 12px 28px;
-  border-radius: 50px;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--white);
-  background: var(--maroon);
-  transition: background var(--transition), transform var(--transition);
-}
-
-.cta:hover {
-  background: var(--maroon-dark);
-  transform: translateY(-2px);
+.ctaGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .videoNote {

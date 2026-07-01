@@ -10,8 +10,17 @@ import authRouter from './routes/auth';
 import adminListingsRouter from './routes/admin/listings';
 import adminImagesRouter from './routes/admin/images';
 
+process.on('unhandledRejection', (reason) => {
+  process.stderr.write(`[fatal] Unhandled rejection: ${reason}\n`);
+});
+
+process.on('uncaughtException', (err) => {
+  process.stderr.write(`[fatal] Uncaught exception: ${err.message}\n${err.stack}\n`);
+  process.exit(1);
+});
+
 async function start() {
-  await initDatabase();
+  initDatabase();
 
   const app = express();
 
