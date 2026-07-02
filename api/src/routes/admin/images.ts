@@ -8,7 +8,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.delete('/:imageId', (req: Request, res: Response) => {
-  const imageId = parseInt(req.params.imageId, 10);
+  const imageId = parseInt(req.params.imageId as string, 10);
   if (isNaN(imageId)) {
     res.status(400).json({ error: 'Invalid image ID', code: 'VALIDATION_ERROR' });
     return;
@@ -37,7 +37,7 @@ router.delete('/:imageId', (req: Request, res: Response) => {
 });
 
 router.patch('/:imageId/primary', (req: Request, res: Response) => {
-  const imageId = parseInt(req.params.imageId, 10);
+  const imageId = parseInt(req.params.imageId as string, 10);
   if (isNaN(imageId)) {
     res.status(400).json({ error: 'Invalid image ID', code: 'VALIDATION_ERROR' });
     return;
