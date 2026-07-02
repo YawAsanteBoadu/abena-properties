@@ -96,7 +96,7 @@ router.post('/', (req: Request, res: Response) => {
 
   runQuery(
     `INSERT INTO listings (id, title, location, city, category, status, price, original_price, type, bedrooms, baths, square_feet, levels, size, completion, expected_completion, description, is_hottest)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id, body.title, body.location, body.city, body.category,
       body.status || 'draft',
@@ -177,7 +177,7 @@ router.delete('/:id', (req: Request, res: Response) => {
     return;
   }
 
-  deleteListingImages(id);
+  deleteListingImages(id as string);
   runQuery('DELETE FROM listings WHERE id = ?', [id]);
   res.json({ success: true });
 });
@@ -254,7 +254,7 @@ router.post(
 
     const results = [];
     for (let i = 0; i < files.length; i++) {
-      const filename = await processAndSaveImage(files[i].buffer, id);
+      const filename = await processAndSaveImage(files[i].buffer, id as string);
       const isPrimary = existingCount === 0 && i === 0 ? 1 : 0;
       const sortOrder = existingCount + i;
 

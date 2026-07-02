@@ -4,3 +4,8 @@ dist/
 uploads/*
 !uploads/.gitkeep
 .env
+.env.example
+
+# Ignore SQLite databases and temporary write-ahead logs
+*.db-shm
+*.db-wal
