@@ -1,5 +1,6 @@
 .facade,
-.player {
+.player,
+.comingSoon {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -69,6 +70,47 @@
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 
+/* ---- Coming-soon state (no video wired up) ---- */
+/* Same poster + scrim treatment as the facade, but no play button and not
+   a button element — visually polished, semantically inert. */
+.comingSoonScrim {
+  position: absolute;
+  inset: 0;
+  /* Slightly darker than the facade's scrim so the copy is readable without
+     an underlay card behind it. */
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.65) 100%);
+}
+
+.comingSoonContent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.comingSoonTitle {
+  margin: 0;
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.comingSoonText {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13.5px;
+  line-height: 1.55;
+  max-width: 360px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
 /* ---- Activated player ---- */
 .media {
   position: absolute;
@@ -79,9 +121,14 @@
   object-fit: cover;
 }
 
+/* Legacy .placeholder rule kept for backward compatibility if anything still
+   references it. Uses the same self-contained sizing so it doesn't detach. */
 .placeholder {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -93,28 +140,9 @@
   background: radial-gradient(circle at 50% 40%, var(--maroon-dark) 0%, var(--black) 80%);
 }
 
-.placeholderIcon {
-  font-size: 30px;
-  opacity: 0.85;
-}
-
-.placeholderTitle {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--white);
-}
-
-.placeholderText {
-  font-size: 13px;
-  max-width: 320px;
-  color: rgba(255, 255, 255, 0.82);
-  line-height: 1.5;
-}
-
-.placeholderText code {
-  font-family: 'Courier New', monospace;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 12px;
+.player .placeholder {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  aspect-ratio: auto;
 }

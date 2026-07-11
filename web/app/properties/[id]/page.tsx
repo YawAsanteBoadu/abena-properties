@@ -155,9 +155,9 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
         <section className={styles.videoCard}>
           <h2 className={styles.cardTitle}>Video Tour</h2>
           <VideoFacade posterSrc={gallery[0]} title={property.title} />
-          <p className={styles.videoNote}>
+          {/* <p className={styles.videoNote}>
             Tap play to load the tour. Nothing video-related is downloaded until you do.
-          </p>
+          </p> */}
         </section>
       </div>
     </article>
