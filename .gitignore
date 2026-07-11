@@ -44,3 +44,6 @@ yarn-error.log*
 coverage/
 
 .claude
+
+ecosystem.config.js
+ecosystem.config.ts
