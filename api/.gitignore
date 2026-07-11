@@ -9,3 +9,6 @@ uploads/*
 # Ignore SQLite databases and temporary write-ahead logs
 *.db-shm
 *.db-wal
+
+ecosystem.config.js
+ecosystem.config.ts
