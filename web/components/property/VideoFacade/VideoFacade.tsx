@@ -26,13 +26,43 @@ interface VideoFacadeProps {
  *
  * Performance + SEO strategy:
  *  - Initial render ships ZERO video bytes and ZERO player APIs. Only a static,
- *    lazy-loaded poster image and a pure-CSS play button are painted.
- *  - The real player (iframe or <video>) is injected ONLY after an explicit
- *    user click — downstream of user intent — so crawlers measuring load
- *    metrics (LCP/TBT/INP) never download the heavy media on first paint.
+ *    lazy-loaded poster image is painted.
+ *  - The real player is injected ONLY after an explicit user click.
+ *  - When no video source is configured, a non-clickable "coming soon" state
+ *    renders with the same poster+scrim treatment as the facade — polished,
+ *    on-brand, but with no play button so the user is never misled.
  */
 export default function VideoFacade({ posterSrc, title, embedUrl, videoUrl }: VideoFacadeProps) {
   const [activated, setActivated] = useState(false);
+  const hasVideo = Boolean(embedUrl || videoUrl);
+
+  // ---- No video source configured. Non-clickable poster + overlay message. ----
+  if (!hasVideo) {
+    return (
+      <div
+        className={styles.comingSoon}
+        role="status"
+        aria-label={`Video tour of ${title} coming soon`}
+      >
+        <Image
+          src={posterSrc}
+          alt={`${title} preview`}
+          fill
+          sizes="(max-width: 900px) 100vw, 50vw"
+          loading="lazy"
+          style={{ objectFit: 'cover' }}
+        />
+        <span className={styles.comingSoonScrim} aria-hidden="true" />
+        <div className={styles.comingSoonContent}>
+          <p className={styles.comingSoonTitle}>Video tour coming soon</p>
+          <p className={styles.comingSoonText}>
+            A walkthrough video for this property is not yet available. Contact
+            our team to schedule an in-person or live virtual tour.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // ---- Facade state: poster + CSS play button only. No video on the page. ----
   if (!activated) {
@@ -83,21 +113,6 @@ export default function VideoFacade({ posterSrc, title, embedUrl, videoUrl }: Vi
         autoPlay
         playsInline
       />
-    );
-  } else {
-    // No real video wired up yet. The facade swap is fully functional; drop in
-    // an `embedUrl` (YouTube/Vimeo) or `videoUrl` (self-hosted file) to go live.
-    media = (
-      <div className={styles.placeholder} role="status">
-        {/* PLACEHOLDER — insert a real video here.
-            Option A: pass embedUrl="https://www.youtube.com/embed/VIDEO_ID"
-            Option B: pass videoUrl="/videos/your-tour.mp4" (file in /public) */}
-        <span className={styles.placeholderIcon} aria-hidden="true">&#9658;</span>
-        <p className={styles.placeholderTitle}>Player ready — no video source set</p>
-        <p className={styles.placeholderText}>
-          Insert a real tour by passing an <code>embedUrl</code> or <code>videoUrl</code> to this card.
-        </p>
-      </div>
     );
   }
 
