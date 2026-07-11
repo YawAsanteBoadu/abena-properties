@@ -32,7 +32,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
-function formatPrice(price: number, type: 'buy' | 'rent') {
+function formatPrice(price: number | undefined, type: 'buy' | 'rent' | undefined) {
+  if (price == null) return '—';
   const formatted = price.toLocaleString();
   return type === 'rent' ? `$${formatted}/mo` : `$${formatted}`;
 }
@@ -46,7 +47,18 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
   }
 
   const gallery = getPropertyGallery(property);
-  const categoryLabel = property.category === 'buy' ? 'Buy' : property.category === 'rent' ? 'Rent' : property.category === 'distress' ? 'Distress Sale' : property.category;
+  const categoryLabel =
+    property.category === 'buy' ? 'Buy'
+    : property.category === 'rent' ? 'Rent'
+    : property.category === 'distress' ? 'Distress Sale'
+    : property.category;
+
+  // Determine which spec fields to show — projects and land don't have all fields.
+  const hasBedrooms = property.bedrooms != null && property.bedrooms > 0;
+  const hasBaths = property.baths != null && property.baths > 0;
+  const hasSquareFeet = property.squareFeet != null && property.squareFeet > 0;
+  const hasLevels = property.levels != null && property.levels > 0;
+  const hasAnySpec = hasBedrooms || hasBaths || hasSquareFeet || hasLevels;
 
   return (
     <article className={styles.page}>
@@ -54,9 +66,11 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
         <Link href="/properties" className={styles.back}>
           &#8249; Back to listings
         </Link>
-        <span className={property.type === 'buy' ? styles.tagBuy : styles.tagRent}>
-          {property.type === 'buy' ? 'For Sale' : 'For Rent'}
-        </span>
+        {property.type && (
+          <span className={property.type === 'buy' ? styles.tagBuy : styles.tagRent}>
+            {property.type === 'buy' ? 'For Sale' : 'For Rent'}
+          </span>
+        )}
       </div>
 
       <header className={styles.header}>
@@ -77,36 +91,53 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
         <section className={styles.detailsCard}>
           <h2 className={styles.cardTitle}>Property Details</h2>
 
-          <div className={styles.specGrid}>
-            <div className={styles.spec}>
-              <span className={styles.specValue}>{property.bedrooms}</span>
-              <span className={styles.specLabel}>Bedrooms</span>
+          {hasAnySpec && (
+            <div className={styles.specGrid}>
+              {hasBedrooms && (
+                <div className={styles.spec}>
+                  <span className={styles.specValue}>{property.bedrooms}</span>
+                  <span className={styles.specLabel}>Bedrooms</span>
+                </div>
+              )}
+              {hasBaths && (
+                <div className={styles.spec}>
+                  <span className={styles.specValue}>{property.baths}</span>
+                  <span className={styles.specLabel}>Bathrooms</span>
+                </div>
+              )}
+              {hasSquareFeet && (
+                <div className={styles.spec}>
+                  <span className={styles.specValue}>{property.squareFeet!.toLocaleString()}</span>
+                  <span className={styles.specLabel}>Sq Ft</span>
+                </div>
+              )}
+              {hasLevels && (
+                <div className={styles.spec}>
+                  <span className={styles.specValue}>{property.levels}</span>
+                  <span className={styles.specLabel}>
+                    {property.levels === 1 ? 'Level' : 'Levels'}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className={styles.spec}>
-              <span className={styles.specValue}>{property.baths}</span>
-              <span className={styles.specLabel}>Bathrooms</span>
-            </div>
-            <div className={styles.spec}>
-              <span className={styles.specValue}>{property.squareFeet.toLocaleString()}</span>
-              <span className={styles.specLabel}>Sq Ft</span>
-            </div>
-            <div className={styles.spec}>
-              <span className={styles.specValue}>{property.levels}</span>
-              <span className={styles.specLabel}>
-                {property.levels === 1 ? 'Level' : 'Levels'}
-              </span>
-            </div>
-          </div>
+          )}
 
           <p className={styles.description}>
             {property.description ??
-              `A premium ${property.type === 'buy' ? 'home for sale' : 'rental'} located in ${property.location}, ${property.city}. Contact our team for a private viewing and the full feature list.`}
+              `A premium ${property.type === 'buy' ? 'home for sale' : property.type === 'rent' ? 'rental' : 'listing'} located in ${property.location}, ${property.city}. Contact our team for a private viewing and the full feature list.`}
           </p>
 
           <ul className={styles.features}>
             <li>Prime location in {property.location}</li>
-            <li>{property.bedrooms} bedrooms &amp; {property.baths} bathrooms</li>
-            <li>{property.squareFeet.toLocaleString()} sq ft across {property.levels} {property.levels === 1 ? 'level' : 'levels'}</li>
+            {hasBedrooms && hasBaths && (
+              <li>{property.bedrooms} bedrooms &amp; {property.baths} bathrooms</li>
+            )}
+            {hasSquareFeet && hasLevels && (
+              <li>
+                {property.squareFeet!.toLocaleString()} sq ft across {property.levels}{' '}
+                {property.levels === 1 ? 'level' : 'levels'}
+              </li>
+            )}
             <li>Vetted and ready for viewing</li>
           </ul>
 
@@ -120,9 +151,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<P
           </div>
         </section>
 
-        {/* Card 2 — video facade (lazy / JIT). No video bytes load until click.
-            To go live, pass embedUrl="https://www.youtube.com/embed/VIDEO_ID"
-            or videoUrl="/videos/your-tour.mp4" (file in /public) below. */}
+        {/* Card 2 — video facade (lazy / JIT). No video bytes load until click. */}
         <section className={styles.videoCard}>
           <h2 className={styles.cardTitle}>Video Tour</h2>
           <VideoFacade posterSrc={gallery[0]} title={property.title} />
