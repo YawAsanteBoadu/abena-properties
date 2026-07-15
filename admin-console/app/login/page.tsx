@@ -46,7 +46,7 @@ export default function LoginPage() {
               name="email"
               required
               className={styles.input}
-              placeholder="admin@abenaproperties.com"
+              placeholder="email or username"
             />
           </label>
           <label className={styles.label}>
