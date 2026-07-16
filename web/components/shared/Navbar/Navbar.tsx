@@ -35,7 +35,7 @@ export default function Navbar() {
               src="/AbProperties_logo.png"
               alt={`${BRAND.name} Logo`}
               fill
-              sizes="(max-width: 768px) 100%, auto"
+              sizes="(max-width: 768px) 65%, auto"
               priority
               className={styles.logoImage}
             />

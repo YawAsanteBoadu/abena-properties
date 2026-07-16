@@ -21,7 +21,7 @@ export const BRAND = {
 export const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Properties', href: '/properties' },
-  { label: 'About Us', href: '/about' },
+  { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ];
 
