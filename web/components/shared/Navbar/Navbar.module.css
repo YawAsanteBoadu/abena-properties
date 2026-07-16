@@ -16,11 +16,14 @@
   transition: background var(--transition);
 }
 
+/* Logo box matches the artwork's ~2.77:1 aspect ratio so `object-fit: contain`
+   fits it exactly (no letterboxing) and it stays inside the 70px bar. */
 .logo {
   position: relative;
   display: inline-block;
-  width: 350px;
-  height: 250px;
+  width: 150px;
+  height: 54px;
+  flex-shrink: 0;
 }
 
 .logoImage {
@@ -30,8 +33,8 @@
 
 @media (max-width: 768px) {
   .logo {
-    width: 320px;
-    height: 250px;
+    width: 124px;
+    height: 44px;
   }
 }
 
@@ -44,13 +47,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--maroon);
-  letter-spacing: -0.5px;
 }
 
 .logoAccent {
