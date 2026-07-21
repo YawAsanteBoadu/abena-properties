@@ -1,4 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL || API_URL;
 
 export interface Property {
   id: string;
@@ -46,7 +47,7 @@ export interface Project {
 
 function toFullUrl(path: string): string {
   if (path.startsWith('http')) return path;
-  return `${API_URL}${path}`;
+  return `${CDN_URL}${path}`;
 }
 
 function mapProperty(item: Record<string, unknown>): Property {
