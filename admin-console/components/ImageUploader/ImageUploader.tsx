@@ -5,14 +5,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { uploadImagesAction, deleteImageAction, setPrimaryImageAction } from '@/lib/actions';
 import { useToast } from '@/components/Toast/ToastContext';
+import { mediaUrl } from '@/lib/media';
 import type { ListingImage } from '@/lib/types';
 import styles from './ImageUploader.module.css';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-function fullUrl(path: string) {
-  return path.startsWith('http') ? path : `${API_URL}${path}`;
-}
 
 interface ImageUploaderProps {
   listingId: string;
@@ -118,7 +113,7 @@ export default function ImageUploader({ listingId, images }: ImageUploaderProps)
             >
               {img.isPrimary && <span className={styles.primaryLabel}>Primary</span>}
               <Image
-                src={fullUrl(img.url)}
+                src={mediaUrl(img.url)}
                 alt={img.filename}
                 width={140}
                 height={140}

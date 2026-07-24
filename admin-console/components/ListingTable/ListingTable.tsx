@@ -6,16 +6,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { deleteListingAction, toggleStatusAction } from '@/lib/actions';
 import { useToast } from '@/components/Toast/ToastContext';
+import { mediaUrl } from '@/lib/media';
 import ConfirmDialog from '@/components/ConfirmDialog/ConfirmDialog';
 import type { Listing, Category } from '@/lib/types';
 import StatusBadge from '@/components/StatusBadge/StatusBadge';
 import styles from './ListingTable.module.css';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-function fullUrl(path: string) {
-  return path.startsWith('http') ? path : `${API_URL}${path}`;
-}
 
 type CategoryFilter = Category | 'all';
 
@@ -36,10 +31,6 @@ export default function ListingTable({ listings }: { listings: Listing[] }) {
   const [isPending, startTransition] = useTransition();
   const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
 
-  // Client-side search over the already-fetched listings array. No network call.
-  // useDeferredValue keeps typing responsive; the filter itself is cheap for the
-  // current ~25 rows and scales comfortably to a few hundred rows before a
-  // server-side search would be worth introducing.
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<CategoryFilter>('all');
   const deferredQuery = useDeferredValue(query);
@@ -213,7 +204,7 @@ export default function ListingTable({ listings }: { listings: Listing[] }) {
               <td>
                 {l.imageUrl && (
                   <Image
-                    src={fullUrl(l.imageUrl)}
+                    src={mediaUrl(l.imageUrl)}
                     alt={l.title}
                     width={48}
                     height={48}
