@@ -9,6 +9,8 @@ import { mediaUrl } from '@/lib/media';
 import type { ListingImage } from '@/lib/types';
 import styles from './ImageUploader.module.css';
 
+const MAX_TOTAL_UPLOAD_BYTES = 25 * 1024 * 1024;
+
 interface ImageUploaderProps {
   listingId: string;
   images: ListingImage[];
@@ -25,6 +27,16 @@ export default function ImageUploader({ listingId, images }: ImageUploaderProps)
   function handleUpload() {
     const files = fileRef.current?.files;
     if (!files || files.length === 0) return;
+
+    const totalBytes = Array.from(files).reduce((sum, f) => sum + f.size, 0);
+    if (totalBytes > MAX_TOTAL_UPLOAD_BYTES) {
+      const totalMb = (totalBytes / 1024 / 1024).toFixed(1);
+      const message = `Total upload size ${totalMb} MB exceeds the 25 MB limit. Please select fewer or smaller files.`;
+      setUploadError(message);
+      showError(message);
+      if (fileRef.current) fileRef.current.value = '';
+      return;
+    }
 
     setUploading(true);
     setUploadError('');
@@ -49,7 +61,7 @@ export default function ImageUploader({ listingId, images }: ImageUploaderProps)
         setUploading(false);
       }
     });
-  }
+}
 
   function handleDelete(imageId: number) {
     if (!confirm('Delete this image?')) return;
