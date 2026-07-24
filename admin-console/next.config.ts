@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
         hostname: 'api.abenaproperties.com',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.abenaproperties.com',
+        pathname: '/uploads/**',
+      },
     ],
   },
 };

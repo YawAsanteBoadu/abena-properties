@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     dangerouslyAllowLocalIP: process.env.NODE_ENV !== 'production',
-    unoptimized: false,
     remotePatterns: [
       {
         protocol: 'http',
@@ -15,6 +14,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'api.abenaproperties.com',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.abenaproperties.com',
         pathname: '/uploads/**',
       },
     ],
